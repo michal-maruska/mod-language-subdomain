@@ -1,0 +1,6 @@
+mod-languagesubdomain (1-1) unstable; urgency=low
+
+  * Initial release (Closes: #nnnn)  <nnnn is the bug number of your ITP>
+
+ -- Michal Maruska <michal@ruska.it>  Sun, 06 Jul 2008 16:20:11 +0200
+
