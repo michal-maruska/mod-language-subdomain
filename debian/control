@@ -7,6 +7,5 @@ Standards-Version: 3.7.2
 
 Package: mod-languagesubdomain
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, apache2.2-common
+Depends: ${shlibs:Depends}, ${misc:Depends}, apache2
 Description: Based on hostname, decide the priority of languages.
-
