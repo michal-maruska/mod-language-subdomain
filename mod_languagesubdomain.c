@@ -295,7 +295,7 @@ static int mod_tut2_method_handler (request_rec *r)
 
 #if 1
           char* new_langs = apr_pstrcat(r->pool, s_cfg->string, ",", new_string, NULL);
-#if 0
+#if DEBUG
           fprintf(stderr,"setting: %s\n", new_langs);
 #endif
           apr_table_setn(hdrs, "Accept-Language",
