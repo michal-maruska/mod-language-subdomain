@@ -107,7 +107,7 @@ get_entry(apr_pool_t *p, accept_rec *result,
      */
 
     result->name = ap_get_token(p, &accept_line, 0);
-    ap_str_tolower(result->name);     /* You want case insensitive,
+    apr_tolower(result->name);     /* You want case insensitive,
                                        * you'll *get* case insensitive.
                                        */
 
@@ -162,7 +162,7 @@ get_entry(apr_pool_t *p, accept_rec *result,
         if (*end) {
             *end = '\0';        /* strip ending quote or return */
         }
-        ap_str_tolower(cp);
+        apr_tolower(cp);
 
         if (parm[0] == 'q'
             && (parm[1] == '\0' || (parm[1] == 's' && parm[2] == '\0'))) {
