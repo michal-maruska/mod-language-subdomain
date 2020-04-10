@@ -1,0 +1,1 @@
+LoadModule languagesubdomain_module /usr/lib/apache2/modules/mod_languagesubdomain.so
