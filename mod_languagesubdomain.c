@@ -1,23 +1,23 @@
 /*
   install:   apxs2   -c -i  mod_languagesubdomain.c
-	
-	Copyright 2002 Kevin O'Donnell
-	Copyright 2007 Michal Maruska
+
+        Copyright 2002 Kevin O'Donnell
+        Copyright 2007 Michal Maruska
 
 
-	This program is free software; you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation; either version 2 of the License, or
-	(at your option) any later version.
+        This program is free software; you can redistribute it and/or modify
+        it under the terms of the GNU General Public License as published by
+        the Free Software Foundation; either version 2 of the License, or
+        (at your option) any later version.
 
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
+        This program is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+        GNU General Public License for more details.
 
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
-	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+        You should have received a copy of the GNU General Public License
+        along with this program; if not, write to the Free Software
+        Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 /*
@@ -50,7 +50,7 @@ module AP_MODULE_DECLARE_DATA languagesubdomain_module;
  * This modules per-server configuration structure.
  */
 typedef struct {
-	char *string;
+        char *string;
 } modtut2_config;
 
 
@@ -226,10 +226,10 @@ static apr_array_header_t *do_header_line(apr_pool_t *p,
  */
 static int mod_tut2_method_handler (request_rec *r)
 {
-	// Get the module configuration
-	modtut2_config *s_cfg = ap_get_module_config(r->server->module_config, &languagesubdomain_module);
+        // Get the module configuration
+        modtut2_config *s_cfg = ap_get_module_config(r->server->module_config, &languagesubdomain_module);
 
-        
+
         if (s_cfg->string)
                 {
                         apr_table_t *hdrs = r->headers_in;
@@ -241,7 +241,7 @@ static int mod_tut2_method_handler (request_rec *r)
                                                /* fixme: should add comma , ? */
                                                /* fixme: I should copy it! */
                                                s_cfg->string);
-                        else 
+                        else
                                 {
 #if DEBUG
                                         fprintf(stderr,"Accept-Language: %s\n", line);
@@ -255,7 +255,7 @@ static int mod_tut2_method_handler (request_rec *r)
 #if DEBUG
                                         fprintf(stderr,"%d languages accepted (%d)! %s\n", langs->nelts, langs->elt_size, s_cfg->string);
 #endif
-        
+
                                         char new_string[400]; /* X*Y should be enough!   or alloca(langs->nelts * langs->elt_size) */
                                         char* ns = new_string; /* cursor */
                                         int i;
@@ -275,7 +275,7 @@ static int mod_tut2_method_handler (request_rec *r)
                                                                 {
                                                                         /* skip */
                                                                 }
-                                                        else 
+                                                        else
                                                                 {
 
 #if 1
@@ -286,11 +286,11 @@ static int mod_tut2_method_handler (request_rec *r)
                                                                                 ns+= sprintf(ns, /* 400 - (ns - new_string),*/
                                                                                              "%s;q=0.9", lang->name);
                                                                         }
-                                                        
+
                                                                         (*(ns++)) = ',';
 #endif
                                                                 }
-                                
+
                                                 }
 #if 1
                                         /* overwrite the last comma! */
@@ -298,7 +298,7 @@ static int mod_tut2_method_handler (request_rec *r)
                                                 (*(ns -1)) ='\0';
                                         else
                                                 *ns = '\0';
-                                        
+
 
                                         /* fprintf(stderr, "new string: %s\n", new_string); */
 #endif
@@ -314,21 +314,21 @@ static int mod_tut2_method_handler (request_rec *r)
 #endif
                                 }
                 }
-        
 
 
-	// Send a message to the log file.
-	
 
-	// We need to flush the stream so that the message appears right away.
-	// Performing an fflush() in a production system is not good for
-	// performance - don't do this for real.
-	fflush(stderr);
+        // Send a message to the log file.
 
-	// Return DECLINED so that the Apache core will keep looking for
-	// other modules to handle this request.  This effectively makes
-	// this module completely transparent.
-	return DECLINED;
+
+        // We need to flush the stream so that the message appears right away.
+        // Performing an fflush() in a production system is not good for
+        // performance - don't do this for real.
+        fflush(stderr);
+
+        // Return DECLINED so that the Apache core will keep looking for
+        // other modules to handle this request.  This effectively makes
+        // this module completely transparent.
+        return DECLINED;
 }
 
 
@@ -344,15 +344,15 @@ static const char* const post_modules[] = { "mod_setenvif.c", NULL };
  */
 static void register_hooks (apr_pool_t *p)
 {
-	// I think this is the call to make to register a handler for method calls (GET PUT et. al.).
-	// We will ask to be last so that the comment has a higher tendency to
-	// go at the end.
+        // I think this is the call to make to register a handler for method calls (GET PUT et. al.).
+        // We will ask to be last so that the comment has a higher tendency to
+        // go at the end.
 #if DEBUG
         fprintf(stderr,"%s:\n", __FUNCTION__);
 #endif
 
 #if 0
-	ap_hook_handler(mod_tut2_method_handler, NULL, NULL,
+        ap_hook_handler(mod_tut2_method_handler, NULL, NULL,
                         APR_HOOK_FIRST
                         /*APR_HOOK_LAST */
                         );
@@ -367,14 +367,14 @@ static void register_hooks (apr_pool_t *p)
  */
 static const char *set_modtut2_string(cmd_parms *parms, void *mconfig, const char *arg)
 {
-	// get the module configuration (this is the structure created by create_lang_config())
-	modtut2_config *s_cfg = ap_get_module_config(parms->server->module_config, &languagesubdomain_module);
+        // get the module configuration (this is the structure created by create_lang_config())
+        modtut2_config *s_cfg = ap_get_module_config(parms->server->module_config, &languagesubdomain_module);
 
-	// make a duplicate of the argument's value using the command parameters pool.
-	s_cfg->string = (char *) arg;
+        // make a duplicate of the argument's value using the command parameters pool.
+        s_cfg->string = (char *) arg;
 
-	// success
-	return NULL;
+        // success
+        return NULL;
 }
 
 /**
@@ -389,14 +389,14 @@ static const command_rec mod_lang_cmds[] =
 
 #define RSRC_CONF 128	     /**< *.conf outside <Directory> or <Location> */
 #endif
-	AP_INIT_TAKE1(
-		"ModuleTutorialString",
-		set_modtut2_string,
-		NULL,
-		RSRC_CONF,      /* mmc: ?? */
-		"ModuleTutorialString <string> -- the string to prepend to Accept-Language header line (for each HTTP request)."
-	),
-	{NULL}
+        AP_INIT_TAKE1(
+                "ModuleTutorialString",
+                set_modtut2_string,
+                NULL,
+                RSRC_CONF,      /* mmc: ?? */
+                "ModuleTutorialString <string> -- the string to prepend to Accept-Language header line (for each HTTP request)."
+        ),
+        {NULL}
 };
 
 /**
@@ -404,16 +404,16 @@ static const command_rec mod_lang_cmds[] =
  */
 static void *create_lang_config(apr_pool_t *p, server_rec *s)
 {
-	modtut2_config *newcfg;
+        modtut2_config *newcfg;
 
-	// allocate space for the configuration structure from the provided pool p.
-	newcfg = (modtut2_config *) apr_pcalloc(p, sizeof(modtut2_config));
+        // allocate space for the configuration structure from the provided pool p.
+        newcfg = (modtut2_config *) apr_pcalloc(p, sizeof(modtut2_config));
 
-	// set the default value for the error string.
-	newcfg->string = NULL;  /*  DEFAULT_MODTUT2_STRING */
+        // set the default value for the error string.
+        newcfg->string = NULL;  /*  DEFAULT_MODTUT2_STRING */
 
-	// return the new server configuration structure.
-	return (void *) newcfg;
+        // return the new server configuration structure.
+        return (void *) newcfg;
 }
 
 /*
@@ -424,11 +424,11 @@ static void *create_lang_config(apr_pool_t *p, server_rec *s)
  */
 module AP_MODULE_DECLARE_DATA languagesubdomain_module =
 {
-	STANDARD20_MODULE_STUFF, // standard stuff; no need to mess with this.
-	NULL, // create per-directory configuration structures - we do not.
-	NULL, // merge per-directory - no need to merge if we are not creating anything.
-	create_lang_config, // create per-server configuration structures.
-	NULL, // merge per-server - hrm - examples I have been reading don't bother with this for trivial cases.
-	mod_lang_cmds, // configuration directive handlers
-	register_hooks, // request handlers
+        STANDARD20_MODULE_STUFF, // standard stuff; no need to mess with this.
+        NULL, // create per-directory configuration structures - we do not.
+        NULL, // merge per-directory - no need to merge if we are not creating anything.
+        create_lang_config, // create per-server configuration structures.
+        NULL, // merge per-server - hrm - examples I have been reading don't bother with this for trivial cases.
+        mod_lang_cmds, // configuration directive handlers
+        register_hooks, // request handlers
 };
