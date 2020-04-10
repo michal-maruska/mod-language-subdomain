@@ -54,12 +54,6 @@ typedef struct {
 } modtut2_config;
 
 
-
-
-
-
-
-
 /*
  * Record of available info on a media type specified by the client
  * (we also use 'em for encodings and languages)
@@ -226,109 +220,105 @@ static apr_array_header_t *do_header_line(apr_pool_t *p,
  */
 static int mod_tut2_method_handler (request_rec *r)
 {
-        // Get the module configuration
-        modtut2_config *s_cfg = ap_get_module_config(r->server->module_config, &languagesubdomain_module);
+  // Get the module configuration
+  modtut2_config *s_cfg = ap_get_module_config(r->server->module_config, &languagesubdomain_module);
 
 
-        if (s_cfg->string)
+  if (s_cfg->string)
+    {
+      apr_table_t *hdrs = r->headers_in;
+
+      const char* line = apr_table_get(hdrs, "Accept-Language");
+
+      if (!line)
+        apr_table_set(hdrs, "Accept-Language",
+                      /* fixme: should add comma , ? */
+                      /* fixme: I should copy it! */
+                      s_cfg->string);
+      else
+        {
+#if DEBUG
+          fprintf(stderr, "Accept-Language: %s\n", line);
+#endif
+          /* is there ap_get_module_config  for vhost? */
+
+          apr_array_header_t *langs  = do_header_line(r->pool, line);
+
+#if DEBUG
+          fprintf(stderr,"%d languages accepted (%d)! %s\n", langs->nelts, langs->elt_size, s_cfg->string);
+#endif
+
+          char new_string[400]; /* X*Y should be enough!   or alloca(langs->nelts * langs->elt_size) */
+          char* ns = new_string; /* cursor */
+          int i;
+          /* int first = 1; */
+          for(i= 0; i< langs->nelts;i++)
+            {
+              /* elt_size */
+              accept_rec *lang = (accept_rec*)
+                (langs->elts + (i*langs->elt_size));
+#if DEBUG
+              fprintf(stderr,"%d: %s: %f!\n", i, lang->name, lang->quality);
+#endif
+
+              if (strcmp(lang->name, s_cfg->string) == 0)
                 {
-                        apr_table_t *hdrs = r->headers_in;
-
-                        const char* line = apr_table_get(hdrs, "Accept-Language");
-
-                        if (!line)
-                                apr_table_set(hdrs, "Accept-Language",
-                                               /* fixme: should add comma , ? */
-                                               /* fixme: I should copy it! */
-                                               s_cfg->string);
-                        else
-                                {
-#if DEBUG
-                                        fprintf(stderr,"Accept-Language: %s\n", line);
-#endif
-
-                                        /* is there ap_get_module_config  for vhost? */
-
-
-                                        apr_array_header_t *langs  = do_header_line(r->pool, line);
-
-#if DEBUG
-                                        fprintf(stderr,"%d languages accepted (%d)! %s\n", langs->nelts, langs->elt_size, s_cfg->string);
-#endif
-
-                                        char new_string[400]; /* X*Y should be enough!   or alloca(langs->nelts * langs->elt_size) */
-                                        char* ns = new_string; /* cursor */
-                                        int i;
-                                        /* int first = 1; */
-                                        for(i= 0; i< langs->nelts;i++)
-                                                {
-                                                        /* elt_size */
-                                                        accept_rec *lang = (accept_rec*)
-                                                                (langs->elts + (i*langs->elt_size));
-#if DEBUG
-                                                        fprintf(stderr,"%d: %s: %f!\n", i, lang->name, lang->quality);
-#endif
-
-
-
-                                                        if (strcmp(lang->name, s_cfg->string) == 0)
-                                                                {
-                                                                        /* skip */
-                                                                }
-                                                        else
-                                                                {
+                  /* skip */
+                }
+              else
+                {
 
 #if 1
-                                                                        if (lang->quality < 0.9) {
-                                                                                ns+= sprintf(ns, /*400 - (ns - new_string), */
-                                                                                             "%s;q=%0.2f", lang->name, lang->quality);
-                                                                        } else {
-                                                                                ns+= sprintf(ns, /* 400 - (ns - new_string),*/
-                                                                                             "%s;q=0.9", lang->name);
-                                                                        }
+                  if (lang->quality < 0.9) {
+                    ns+= sprintf(ns, /*400 - (ns - new_string), */
+                                 "%s;q=%0.2f", lang->name, lang->quality);
+                  } else {
+                    ns+= sprintf(ns, /* 400 - (ns - new_string),*/
+                                 "%s;q=0.9", lang->name);
+                  }
 
-                                                                        (*(ns++)) = ',';
+                  (*(ns++)) = ',';
 #endif
-                                                                }
-
-                                                }
-#if 1
-                                        /* overwrite the last comma! */
-                                        if (ns != new_string)
-                                                (*(ns -1)) ='\0';
-                                        else
-                                                *ns = '\0';
-
-
-                                        /* fprintf(stderr, "new string: %s\n", new_string); */
-#endif
-
-#if 1
-                                        char* new_langs = apr_pstrcat(r->pool, s_cfg->string, ",", new_string, NULL);
-#if 0
-                                        fprintf(stderr,"setting: %s\n", new_langs);
-#endif
-                                        apr_table_setn(hdrs, "Accept-Language",
-                                                       /* fixme: should add comma , ? */
-                                                       new_langs);
-#endif
-                                }
                 }
 
+            }
+#if 1
+          /* overwrite the last comma! */
+          if (ns != new_string)
+            (*(ns -1)) ='\0';
+          else
+            *ns = '\0';
 
 
-        // Send a message to the log file.
+          /* fprintf(stderr, "new string: %s\n", new_string); */
+#endif
+
+#if 1
+          char* new_langs = apr_pstrcat(r->pool, s_cfg->string, ",", new_string, NULL);
+#if 0
+          fprintf(stderr,"setting: %s\n", new_langs);
+#endif
+          apr_table_setn(hdrs, "Accept-Language",
+                         /* fixme: should add comma , ? */
+                         new_langs);
+#endif
+        }
+    }
 
 
-        // We need to flush the stream so that the message appears right away.
-        // Performing an fflush() in a production system is not good for
-        // performance - don't do this for real.
-        fflush(stderr);
 
-        // Return DECLINED so that the Apache core will keep looking for
-        // other modules to handle this request.  This effectively makes
-        // this module completely transparent.
-        return DECLINED;
+  // Send a message to the log file.
+
+
+  // We need to flush the stream so that the message appears right away.
+  // Performing an fflush() in a production system is not good for
+  // performance - don't do this for real.
+  fflush(stderr);
+
+  // Return DECLINED so that the Apache core will keep looking for
+  // other modules to handle this request.  This effectively makes
+  // this module completely transparent.
+  return DECLINED;
 }
 
 
