@@ -1,29 +1,21 @@
+# APXS=/usr/bin/apxs2
+
+builddir=.
+top_srcdir=/usr/share/apache2
+top_builddir=/usr/share/apache2
+include /usr/share/apache2/build/special.mk
+
+all: local-shared-build
+
+install: install-modules-yes
 
 
-APXS=/usr/bin/apxs2
-
-NAME := mod_languagesubdomain
-MODULE := $(NAME).so
-all: $(MODULE)
-
-# 
-$(MODULE): %.so : %.c
-	$(APXS) -c $^
-
-
-# does not support DESTDIR
-# https://bz.apache.org/bugzilla/show_bug.cgi?id=32930
-# $(APXS) -i $^
-
-
-install: $(MODULE)
-	# don't fail on permission denied :(
-	- apxs -i $(NAME).c
-	# manually install into destdir:
+debinstall:
 	install --directory $(DESTDIR)/usr/lib/apache2/modules/
-	/usr/share/apr-1.0/build/libtool --mode=install install mod_languagesubdomain.c $(DESTDIR)/usr/lib/apache2/modules/
-	# install $(MODULE) $(DESTDIR)/usr/lib/apache2/modules/
+	/usr/share/apr-1.0/build/libtool --no-silent --mode=install install mod_languagesubdomain.la $(DESTDIR)/usr/lib/apache2/modules/
 
 # sudo apxs2 -n languagesubdomain -i mod_languagesubdomain.la
 
 clean:
+
+
