@@ -2,7 +2,7 @@ Source: mod-languagesubdomain
 Section: httpd
 Priority: extra
 Maintainer: Michal Maruska <michal@ruska.it>
-Build-Depends: cdbs, debhelper (>= 5), apache2-prefork-dev (>= 2.2.3) | apache2-threaded-dev (>= 2.2.3)
+Build-Depends: debhelper (>= 5), apache2-dev
 Standards-Version: 3.7.2
 
 Package: mod-languagesubdomain
