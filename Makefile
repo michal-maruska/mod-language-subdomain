@@ -7,10 +7,10 @@ include /usr/share/apache2/build/special.mk
 
 all: local-shared-build
 
-install: install-modules-yes
+# install: install-modules-yes
 
 
-debinstall:
+install:
 	install --directory $(DESTDIR)/usr/lib/apache2/modules/
 	/usr/share/apr-1.0/build/libtool --no-silent --mode=install install mod_languagesubdomain.la $(DESTDIR)/usr/lib/apache2/modules/
 
