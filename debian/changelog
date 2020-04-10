@@ -1,3 +1,20 @@
+mod-languagesubdomain (2.0) unstable; urgency=medium
+
+  * Drop cdbs & old apache pkgs
+  * cdbs
+  * apache2
+  * Makefile: use apxs even to install, but work-around DESTDIR
+  * spaces
+  * Adopt the Makefile from a sample created by "apxs2 -g -n sample"
+  * Tune the install
+  * install the config too
+  * apr_tolower
+  * spaces
+  * add readme
+  * improve logging
+
+ -- Michal Maruska <mmaruska@gmail.com>  Sat, 11 Apr 2020 01:43:01 +0200
+
 mod-languagesubdomain (1-1) unstable; urgency=low
 
   * Initial release (Closes: #nnnn)  <nnnn is the bug number of your ITP>
