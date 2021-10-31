@@ -386,21 +386,15 @@ static const char *set_modtut2_string(cmd_parms *parms, void *mconfig, const cha
  */
 static const command_rec mod_lang_cmds[] =
 {
-#if 0
-        /** method of declaring a directive which takes 1 argument */
-# define AP_INIT_TAKE1(directive, func, mconfig, where, help) \
-    { directive, { .take1=func }, mconfig, where, TAKE1, help }
-
-#define RSRC_CONF 128	     /**< *.conf outside <Directory> or <Location> */
-#endif
-        AP_INIT_TAKE1(
-                "ModuleTutorialString",
-                set_modtut2_string,
-                NULL,
-                RSRC_CONF,      /* mmc: ?? */
+  AP_INIT_TAKE1(
+                "ModuleTutorialString", // directive
+                set_modtut2_string,     // func
+                NULL,                   // mconfig
+                RSRC_CONF,              // where. /**< *.conf outside &lt;Directory&gt; or &lt;Location&gt; */
+                // help:
                 "ModuleTutorialString <string> -- the string to prepend to Accept-Language header line (for each HTTP request)."
-        ),
-        {NULL}
+                ),
+  {NULL}
 };
 
 /**
