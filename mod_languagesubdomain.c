@@ -388,12 +388,12 @@ static const char *set_modtut2_string(cmd_parms *parms, void *mconfig, const cha
 static const command_rec mod_lang_cmds[] =
 {
   AP_INIT_TAKE1(
-                "ModuleTutorialString", // directive
+                "PrioritizedLanguage", // directive
                 set_modtut2_string,     // func
                 NULL,                   // mconfig
                 RSRC_CONF,              // where. /**< *.conf outside &lt;Directory&gt; or &lt;Location&gt; */
                 // help:
-                "ModuleTutorialString <string> -- the string to prepend to Accept-Language header line (for each HTTP request)."
+                "PrioritizedLanguage <string> -- the string to prepend to Accept-Language header line (for each HTTP request)."
                 ),
   {NULL}
 };
