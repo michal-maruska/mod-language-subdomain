@@ -423,10 +423,15 @@ static void *create_server_config(apr_pool_t *pool, server_rec *server)
 
 merge_server_config(apr_pool_t *p, void *base_conf, void *new_conf)
 {
+  mod_configuration* base = (mod_configuration*) base_conf;
+  mod_configuration* new = (mod_configuration*) new_conf;
+
 #if DEBUG
         fprintf(stderr, "%s: Merge per-server configuration for %s / with %s\n", __func__,
-                (char*) new_conf, (char*) base_conf);
+                new->string, base->string);
 #endif
+        if (new_conf == NULL)
+          return base_conf;
         return new_conf;
 }
 
