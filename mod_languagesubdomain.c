@@ -435,4 +435,5 @@ module AP_MODULE_DECLARE_DATA languagesubdomain_module =
         NULL, // merge per-server - hrm - examples I have been reading don't bother with this for trivial cases.
         mod_lang_cmds, // configuration directive handlers
         register_hooks, // request handlers
+        AP_MODULE_FLAG_NONE
 };
