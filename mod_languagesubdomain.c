@@ -361,6 +361,7 @@ static void register_hooks (apr_pool_t *p)
 
 /**
  * This function is called when the "ModTut2String" configuration directive is parsed.
+ * (cmd_parms *parms, void *mconfig, const char *w)
  */
 static const char *set_modtut2_string(cmd_parms *parms, void *mconfig, const char *arg)
 {
@@ -432,6 +433,7 @@ static void *create_server_config(apr_pool_t *pool, server_rec *server)
 module AP_MODULE_DECLARE_DATA languagesubdomain_module =
 {
         STANDARD20_MODULE_STUFF, // standard stuff; no need to mess with this.
+        // rewrite_args
         NULL, // create per-directory configuration structures - we do not.
         NULL, // merge per-directory - no need to merge if we are not creating anything.
         create_server_config, // create per-server configuration structures.
