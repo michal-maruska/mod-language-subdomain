@@ -1,3 +1,10 @@
+mod-languagesubdomain (2.3-maruska) unstable; urgency=medium
+
+  * fix the configuration command name: PrioritizedLanguage
+  * Improve the readme
+
+ -- Michal Maruska <mmaruska@gmail.com>  Sun, 31 Oct 2021 22:10:29 +0100
+
 mod-languagesubdomain (2.2) unstable; urgency=medium
 
   * stupid header files' paths
