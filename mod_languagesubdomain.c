@@ -420,6 +420,16 @@ static void *create_server_config(apr_pool_t *pool, server_rec *server)
         return (void *) newcfg;
 }
 
+merge_server_config(apr_pool_t *p, void *base_conf, void *new_conf)
+{
+#if DEBUG
+        fprintf(stderr, "%s: Merge per-server configuration for %s / with %s\n", __func__,
+                (char*) new_conf, (char*) base_conf);
+#endif
+        return new_conf;
+}
+
+
 /*
  * Declare and populate the module's data structure.  The
  * name of this structure ('languagesubdomain_module') is important - it
@@ -433,7 +443,7 @@ module AP_MODULE_DECLARE_DATA languagesubdomain_module =
         NULL, // create per-directory configuration structures - we do not.
         NULL, // merge per-directory - no need to merge if we are not creating anything.
         create_server_config, // create per-server configuration structures.
-        NULL, // merge per-server - hrm - examples I have been reading don't bother with this for trivial cases.
+        merge_server_config, // merge per-server - hrm - examples I have been reading don't bother with this for trivial cases.
         mod_lang_cmds, // configuration directive handlers
         register_hooks, // request handlers
         AP_MODULE_FLAG_NONE
