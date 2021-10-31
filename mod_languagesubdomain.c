@@ -35,7 +35,7 @@
  * The default value for the error string.
  */
 #ifndef DEFAULT_MODTUT2_STRING
-#define DEFAULT_MODTUT2_STRING "apache2_mod_tut2: A request was made."
+#define DEFAULT_MODTUT2_STRING "en"
 #endif
 
 #define DEBUG 1
@@ -417,7 +417,7 @@ static void *create_server_config(apr_pool_t *pool, server_rec *server)
         newcfg = (modtut2_config *) apr_pcalloc(pool, sizeof(modtut2_config));
 
         // set the default value for the error string.
-        newcfg->string = NULL;  /*  DEFAULT_MODTUT2_STRING */
+        newcfg->string = DEFAULT_MODTUT2_STRING;
 
         // return the new server configuration structure.
         return (void *) newcfg;
