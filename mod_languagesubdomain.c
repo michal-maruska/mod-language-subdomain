@@ -414,6 +414,7 @@ static void *create_server_config(apr_pool_t *pool, server_rec *server)
         // set the default value for the error string.
         newcfg->string = DEFAULT_MODTUT2_STRING;
 
+        ap_set_module_config(server->module_config, &languagesubdomain_module, newcfg);
         // return the new server configuration structure.
         return (void *) newcfg;
 }
