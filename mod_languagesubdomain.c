@@ -230,7 +230,6 @@ static int mod_tut2_method_handler (request_rec *r)
   if (s_cfg->string)
     {
       apr_table_t *hdrs = r->headers_in;
-
       const char* line = apr_table_get(hdrs, "Accept-Language");
 
 #if DEBUG
@@ -374,7 +373,9 @@ static const char *set_modtut2_string(cmd_parms *parms, void *mconfig, const cha
                 (char *) arg,
                 s_cfg->string);
 #endif
+        // fixme: should I deallocate the previous value?
         // make a duplicate of the argument's value using the command parameters pool.
+        // fixme: ^^^
         s_cfg->string = (char *) arg;
 
         // success
