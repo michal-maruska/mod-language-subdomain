@@ -60,10 +60,10 @@ typedef struct {
  */
 
 typedef struct accept_rec {
-    char *name;                 /* MUST be lowercase */
-    float quality;
-    float level;
-    char *charset;              /* for content-type only */
+        char *name;                 /* MUST be lowercase */
+        float quality;
+        float level;
+        char *charset;              /* for content-type only */
 } accept_rec;
 
 
@@ -83,98 +83,98 @@ typedef struct accept_rec {
 static
 const char *
 get_entry(apr_pool_t *p, accept_rec *result,
-                             const char *accept_line)
+          const char *accept_line)
 {
-    result->quality = 1.0f;
-    result->level = 0.0f;
-    result->charset = "";
+        result->quality = 1.0f;
+        result->level = 0.0f;
+        result->charset = "";
 
-    /*
-     * Note that this handles what I gather is the "old format",
-     *
-     *    Accept: text/html text/plain moo/zot
-     *
-     * without any compatibility kludges --- if the token after the
-     * MIME type begins with a semicolon, we know we're looking at parms,
-     * otherwise, we know we aren't.  (So why all the pissing and moaning
-     * in the CERN server code?  I must be missing something).
-     */
+        /*
+         * Note that this handles what I gather is the "old format",
+         *
+         *    Accept: text/html text/plain moo/zot
+         *
+         * without any compatibility kludges --- if the token after the
+         * MIME type begins with a semicolon, we know we're looking at parms,
+         * otherwise, we know we aren't.  (So why all the pissing and moaning
+         * in the CERN server code?  I must be missing something).
+         */
 
-    result->name = ap_get_token(p, &accept_line, 0);
-    apr_tolower(result->name);     /* You want case insensitive,
-                                       * you'll *get* case insensitive.
-                                       */
+        result->name = ap_get_token(p, &accept_line, 0);
+        apr_tolower(result->name);     /* You want case insensitive,
+                                        * you'll *get* case insensitive.
+                                        */
 
-    /* KLUDGE!!! Default HTML to level 2.0 unless the browser
-     * *explicitly* says something else.
-     */
+        /* KLUDGE!!! Default HTML to level 2.0 unless the browser
+         * *explicitly* says something else.
+         */
 
-    if (!strcmp(result->name, "text/html") && (result->level == 0.0)) {
-        result->level = 2.0f;
-    }
-    else if (!strcmp(result->name, INCLUDES_MAGIC_TYPE)) {
-        result->level = 2.0f;
-    }
-    else if (!strcmp(result->name, INCLUDES_MAGIC_TYPE3)) {
-        result->level = 3.0f;
-    }
-
-    while (*accept_line == ';') {
-        /* Parameters ... */
-
-        char *parm;
-        char *cp;
-        char *end;
-
-        ++accept_line;
-        parm = ap_get_token(p, &accept_line, 1);
-
-        /* Look for 'var = value' --- and make sure the var is in lcase. */
-
-        for (cp = parm; (*cp && !apr_isspace(*cp) && *cp != '='); ++cp) {
-            *cp = apr_tolower(*cp);
+        if (!strcmp(result->name, "text/html") && (result->level == 0.0)) {
+                result->level = 2.0f;
+        }
+        else if (!strcmp(result->name, INCLUDES_MAGIC_TYPE)) {
+                result->level = 2.0f;
+        }
+        else if (!strcmp(result->name, INCLUDES_MAGIC_TYPE3)) {
+                result->level = 3.0f;
         }
 
-        if (!*cp) {
-            continue;           /* No '='; just ignore it. */
+        while (*accept_line == ';') {
+                /* Parameters ... */
+
+                char *parm;
+                char *cp;
+                char *end;
+
+                ++accept_line;
+                parm = ap_get_token(p, &accept_line, 1);
+
+                /* Look for 'var = value' --- and make sure the var is in lcase. */
+
+                for (cp = parm; (*cp && !apr_isspace(*cp) && *cp != '='); ++cp) {
+                        *cp = apr_tolower(*cp);
+                }
+
+                if (!*cp) {
+                        continue;           /* No '='; just ignore it. */
+                }
+
+                *cp++ = '\0';           /* Delimit var */
+                while (*cp && (apr_isspace(*cp) || *cp == '=')) {
+                        ++cp;
+                }
+
+                if (*cp == '"') {
+                        ++cp;
+                        for (end = cp;
+                             (*end && *end != '\n' && *end != '\r' && *end != '\"');
+                             end++);
+                }
+                else {
+                        for (end = cp; (*end && !apr_isspace(*end)); end++);
+                }
+                if (*end) {
+                        *end = '\0';        /* strip ending quote or return */
+                }
+                apr_tolower(cp);
+
+                if (parm[0] == 'q'
+                    && (parm[1] == '\0' || (parm[1] == 's' && parm[2] == '\0'))) {
+                        result->quality = (float)atof(cp);
+                }
+                else if (parm[0] == 'l' && !strcmp(&parm[1], "evel")) {
+                        result->level = (float)atof(cp);
+                }
+                else if (!strcmp(parm, "charset")) {
+                        result->charset = cp;
+                }
         }
 
-        *cp++ = '\0';           /* Delimit var */
-        while (*cp && (apr_isspace(*cp) || *cp == '=')) {
-            ++cp;
+        if (*accept_line == ',') {
+                ++accept_line;
         }
 
-        if (*cp == '"') {
-            ++cp;
-            for (end = cp;
-                 (*end && *end != '\n' && *end != '\r' && *end != '\"');
-                 end++);
-        }
-        else {
-            for (end = cp; (*end && !apr_isspace(*end)); end++);
-        }
-        if (*end) {
-            *end = '\0';        /* strip ending quote or return */
-        }
-        apr_tolower(cp);
-
-        if (parm[0] == 'q'
-            && (parm[1] == '\0' || (parm[1] == 's' && parm[2] == '\0'))) {
-            result->quality = (float)atof(cp);
-        }
-        else if (parm[0] == 'l' && !strcmp(&parm[1], "evel")) {
-            result->level = (float)atof(cp);
-        }
-        else if (!strcmp(parm, "charset")) {
-            result->charset = cp;
-        }
-    }
-
-    if (*accept_line == ',') {
-        ++accept_line;
-    }
-
-    return accept_line;
+        return accept_line;
 }
 
 
@@ -193,20 +193,20 @@ get_entry(apr_pool_t *p, accept_rec *result,
 static apr_array_header_t *do_header_line(apr_pool_t *p,
                                           const char *accept_line)
 {
-    apr_array_header_t *accept_recs;
+        apr_array_header_t *accept_recs;
 
-    if (!accept_line) {
-        return NULL;
-    }
+        if (!accept_line) {
+                return NULL;
+        }
 
-    accept_recs = apr_array_make(p, 40, sizeof(accept_rec));
+        accept_recs = apr_array_make(p, 40, sizeof(accept_rec));
 
-    while (*accept_line) {
-        accept_rec *new = (accept_rec *) apr_array_push(accept_recs);
-        accept_line = get_entry(p, new, accept_line);
-    }
+        while (*accept_line) {
+                accept_rec *new = (accept_rec *) apr_array_push(accept_recs);
+                accept_line = get_entry(p, new, accept_line);
+        }
 
-    return accept_recs;
+        return accept_recs;
 }
 
 
@@ -220,111 +220,111 @@ static apr_array_header_t *do_header_line(apr_pool_t *p,
  */
 static int mod_tut2_method_handler (request_rec *r)
 {
-  // Get the module configuration
-  mod_configuration *s_cfg = ap_get_module_config(r->server->module_config, &languagesubdomain_module);
+        // Get the module configuration
+        mod_configuration *s_cfg = ap_get_module_config(r->server->module_config, &languagesubdomain_module);
 
 #if DEBUG
-  fprintf(stderr, "%s: running (server %s)\n", __func__, r->server->server_hostname);
+        fprintf(stderr, "%s: running (server %s)\n", __func__, r->server->server_hostname);
 #endif
 
-  if (s_cfg->string)
-    {
-      apr_table_t *hdrs = r->headers_in;
-      const char* line = apr_table_get(hdrs, "Accept-Language");
-
-#if DEBUG
-          fprintf(stderr, "Found the configuration %s\n", line);
-#endif
-
-      if (!line)
-        apr_table_set(hdrs, "Accept-Language",
-                      /* fixme: should add comma , ? */
-                      /* fixme: I should copy it! */
-                      s_cfg->string);
-      else
+        if (s_cfg->string)
         {
-#if DEBUG
-          fprintf(stderr, "Accept-Language: %s\n", line);
-#endif
-          /* is there ap_get_module_config  for vhost? */
-
-          apr_array_header_t *langs  = do_header_line(r->pool, line);
+                apr_table_t *hdrs = r->headers_in;
+                const char* line = apr_table_get(hdrs, "Accept-Language");
 
 #if DEBUG
-          fprintf(stderr,"%d languages accepted (%d)! %s\n", langs->nelts, langs->elt_size, s_cfg->string);
+                fprintf(stderr, "Found the configuration %s\n", line);
 #endif
 
-          char new_string[400]; /* X*Y should be enough!   or alloca(langs->nelts * langs->elt_size) */
-          char* ns = new_string; /* cursor */
-          int i;
-          /* int first = 1; */
-          for(i= 0; i< langs->nelts;i++)
-            {
-              /* elt_size */
-              accept_rec *lang = (accept_rec*)
-                (langs->elts + (i*langs->elt_size));
-#if DEBUG
-              fprintf(stderr,"%d: %s: %f!\n", i, lang->name, lang->quality);
-#endif
-
-              if (strcmp(lang->name, s_cfg->string) == 0)
+                if (!line)
+                        apr_table_set(hdrs, "Accept-Language",
+                                      /* fixme: should add comma , ? */
+                                      /* fixme: I should copy it! */
+                                      s_cfg->string);
+                else
                 {
-                  /* skip */
-                }
-              else
-                {
-
-#if 1
-                  if (lang->quality < 0.9) {
-                    ns+= sprintf(ns, /*400 - (ns - new_string), */
-                                 "%s;q=%0.2f", lang->name, lang->quality);
-                  } else {
-                    ns+= sprintf(ns, /* 400 - (ns - new_string),*/
-                                 "%s;q=0.9", lang->name);
-                  }
-
-                  (*(ns++)) = ',';
-#endif
-                }
-
-            }
-#if 1
-          /* overwrite the last comma! */
-          if (ns != new_string)
-            (*(ns -1)) ='\0';
-          else
-            *ns = '\0';
-
-
-          /* fprintf(stderr, "new string: %s\n", new_string); */
-#endif
-
-#if 1
-          char* new_langs = apr_pstrcat(r->pool, s_cfg->string, ",", new_string, NULL);
 #if DEBUG
-          fprintf(stderr,"setting: %s\n", new_langs);
+                        fprintf(stderr, "Accept-Language: %s\n", line);
 #endif
-          apr_table_setn(hdrs, "Accept-Language",
-                         /* fixme: should add comma , ? */
-                         new_langs);
+                        /* is there ap_get_module_config  for vhost? */
+
+                        apr_array_header_t *langs  = do_header_line(r->pool, line);
+
+#if DEBUG
+                        fprintf(stderr,"%d languages accepted (%d)! %s\n", langs->nelts, langs->elt_size, s_cfg->string);
 #endif
+
+                        char new_string[400]; /* X*Y should be enough!   or alloca(langs->nelts * langs->elt_size) */
+                        char* ns = new_string; /* cursor */
+                        int i;
+                        /* int first = 1; */
+                        for(i= 0; i< langs->nelts;i++)
+                        {
+                                /* elt_size */
+                                accept_rec *lang = (accept_rec*)
+                                        (langs->elts + (i*langs->elt_size));
+#if DEBUG
+                                fprintf(stderr,"%d: %s: %f!\n", i, lang->name, lang->quality);
+#endif
+
+                                if (strcmp(lang->name, s_cfg->string) == 0)
+                                {
+                                        /* skip */
+                                }
+                                else
+                                {
+
+#if 1
+                                        if (lang->quality < 0.9) {
+                                                ns+= sprintf(ns, /*400 - (ns - new_string), */
+                                                             "%s;q=%0.2f", lang->name, lang->quality);
+                                        } else {
+                                                ns+= sprintf(ns, /* 400 - (ns - new_string),*/
+                                                             "%s;q=0.9", lang->name);
+                                        }
+
+                                        (*(ns++)) = ',';
+#endif
+                                }
+
+                        }
+#if 1
+                        /* overwrite the last comma! */
+                        if (ns != new_string)
+                                (*(ns -1)) ='\0';
+                        else
+                                *ns = '\0';
+
+
+                        /* fprintf(stderr, "new string: %s\n", new_string); */
+#endif
+
+#if 1
+                        char* new_langs = apr_pstrcat(r->pool, s_cfg->string, ",", new_string, NULL);
+#if DEBUG
+                        fprintf(stderr,"setting: %s\n", new_langs);
+#endif
+                        apr_table_setn(hdrs, "Accept-Language",
+                                       /* fixme: should add comma , ? */
+                                       new_langs);
+#endif
+                }
         }
-    }
 
 
 
-  // Send a message to the log file.
+        // Send a message to the log file.
 
 
-  // We need to flush the stream so that the message appears right away.
-  // Performing an fflush() in a production system is not good for
-  // performance - don't do this for real.
-  fflush(stderr);
+        // We need to flush the stream so that the message appears right away.
+        // Performing an fflush() in a production system is not good for
+        // performance - don't do this for real.
+        fflush(stderr);
 
-  // Return DECLINED so that the Apache core will keep looking for
-  // other modules to handle this request.  This effectively makes
-  // this module completely transparent.
-  return DECLINED;
+        // Return DECLINED so that the Apache core will keep looking for
+        // other modules to handle this request.  This effectively makes
+        // this module completely transparent.
+        return DECLINED;
 }
 
 
@@ -351,7 +351,7 @@ static void register_hooks (apr_pool_t *p)
         ap_hook_handler(mod_tut2_method_handler, NULL, NULL,
                         APR_HOOK_FIRST
                         /*APR_HOOK_LAST */
-                        );
+                );
 #endif
         ap_hook_header_parser(mod_tut2_method_handler, NULL, NULL, APR_HOOK_MIDDLE);
         /* mod_ipenv:
@@ -387,7 +387,7 @@ static const char *set_modtut2_string(cmd_parms *parms, void *mconfig, const cha
  */
 static const command_rec mod_lang_cmds[] =
 {
-  AP_INIT_TAKE1(
+        AP_INIT_TAKE1(
                 "PrioritizedLanguage", // directive
                 set_modtut2_string,     // func
                 NULL,                   // mconfig
@@ -395,7 +395,7 @@ static const command_rec mod_lang_cmds[] =
                 // help:
                 "PrioritizedLanguage <string> -- the string to prepend to Accept-Language header line (for each HTTP request)."
                 ),
-  {NULL}
+        {NULL}
 };
 
 /**
@@ -423,15 +423,15 @@ static void *create_server_config(apr_pool_t *pool, server_rec *server)
 
 merge_server_config(apr_pool_t *p, void *base_conf, void *new_conf)
 {
-  mod_configuration* base = (mod_configuration*) base_conf;
-  mod_configuration* new = (mod_configuration*) new_conf;
+        mod_configuration* base = (mod_configuration*) base_conf;
+        mod_configuration* new = (mod_configuration*) new_conf;
 
 #if DEBUG
         fprintf(stderr, "%s: Merge per-server configuration for %s / with %s\n", __func__,
                 new->string, base->string);
 #endif
         if (new_conf == NULL)
-          return base_conf;
+                return base_conf;
         return new_conf;
 }
 
@@ -442,8 +442,7 @@ merge_server_config(apr_pool_t *p, void *base_conf, void *new_conf)
  * must match the name of the module.  This structure is the
  * only "glue" between the httpd core and the module.
  */
-module AP_MODULE_DECLARE_DATA languagesubdomain_module =
-{
+module AP_MODULE_DECLARE_DATA languagesubdomain_module = {
         STANDARD20_MODULE_STUFF, // standard stuff; no need to mess with this.
         // rewrite_args
         NULL, // create per-directory configuration structures - we do not.
