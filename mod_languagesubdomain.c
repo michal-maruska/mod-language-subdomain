@@ -405,7 +405,7 @@ static const command_rec mod_lang_cmds[] =
 /**
  * Creates the per-server configuration records.
  */
-static void *create_lang_config(apr_pool_t *p, server_rec *s)
+static void *create_server_config(apr_pool_t *pool, server_rec *server)
 {
         modtut2_config *newcfg;
 #if DEBUG
@@ -414,7 +414,7 @@ static void *create_lang_config(apr_pool_t *p, server_rec *s)
 #endif
 
         // allocate space for the configuration structure from the provided pool p.
-        newcfg = (modtut2_config *) apr_pcalloc(p, sizeof(modtut2_config));
+        newcfg = (modtut2_config *) apr_pcalloc(pool, sizeof(modtut2_config));
 
         // set the default value for the error string.
         newcfg->string = NULL;  /*  DEFAULT_MODTUT2_STRING */
@@ -434,7 +434,7 @@ module AP_MODULE_DECLARE_DATA languagesubdomain_module =
         STANDARD20_MODULE_STUFF, // standard stuff; no need to mess with this.
         NULL, // create per-directory configuration structures - we do not.
         NULL, // merge per-directory - no need to merge if we are not creating anything.
-        create_lang_config, // create per-server configuration structures.
+        create_server_config, // create per-server configuration structures.
         NULL, // merge per-server - hrm - examples I have been reading don't bother with this for trivial cases.
         mod_lang_cmds, // configuration directive handlers
         register_hooks, // request handlers
