@@ -1,8 +1,7 @@
 # module to simulate user's preference for language (by VHOST)
 
-Image you have have  it.host.com and ru.host.com and want to serve
+Imagine you have have "it.host.com" and "ru.host.com" and want to serve
 content in italian on the former, and russion on the latter.
-
 
 ## Activation:
 ```
@@ -16,7 +15,8 @@ in the VHOST add this
 PrioritizedLanguage "it"
 ```
 
-Don't forget the activate the .... Negotiation.
+Don't forget the activate the .... Negotiation.:
 
+* mods-enabled/negotiation.load
 * create  *.{lang}.html files
 * remove  *.html files
