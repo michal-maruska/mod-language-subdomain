@@ -38,7 +38,7 @@
 #define DEFAULT_MODTUT2_STRING "apache2_mod_tut2: A request was made."
 #endif
 
-#define DEBUG 0
+#define DEBUG 1
 
 
 /*
@@ -223,12 +223,19 @@ static int mod_tut2_method_handler (request_rec *r)
   // Get the module configuration
   modtut2_config *s_cfg = ap_get_module_config(r->server->module_config, &languagesubdomain_module);
 
+#if DEBUG
+  fprintf(stderr, "%s: running (server %s)\n", __func__, r->server->server_hostname);
+#endif
 
   if (s_cfg->string)
     {
       apr_table_t *hdrs = r->headers_in;
 
       const char* line = apr_table_get(hdrs, "Accept-Language");
+
+#if DEBUG
+          fprintf(stderr, "Found the configuration %s\n", line);
+#endif
 
       if (!line)
         apr_table_set(hdrs, "Accept-Language",
@@ -360,6 +367,12 @@ static const char *set_modtut2_string(cmd_parms *parms, void *mconfig, const cha
         // get the module configuration (this is the structure created by create_lang_config())
         modtut2_config *s_cfg = ap_get_module_config(parms->server->module_config, &languagesubdomain_module);
 
+#if DEBUG
+        fprintf(stderr,"%s: re-configuring for %s %s (currently %s)\n", __FUNCTION__,
+                parms->server->server_hostname,
+                (char *) arg,
+                s_cfg->string);
+#endif
         // make a duplicate of the argument's value using the command parameters pool.
         s_cfg->string = (char *) arg;
 
@@ -395,6 +408,10 @@ static const command_rec mod_lang_cmds[] =
 static void *create_lang_config(apr_pool_t *p, server_rec *s)
 {
         modtut2_config *newcfg;
+#if DEBUG
+        fprintf(stderr, "%s: Create per-server configuration for %s / %s\n", __func__,
+                server->defn_name, server->server_hostname);
+#endif
 
         // allocate space for the configuration structure from the provided pool p.
         newcfg = (modtut2_config *) apr_pcalloc(p, sizeof(modtut2_config));
