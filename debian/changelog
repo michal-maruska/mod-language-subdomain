@@ -1,3 +1,18 @@
+mod-languagesubdomain (2.2) unstable; urgency=medium
+
+  * stupid header files' paths
+  * more DEBUG
+  * rename to create_server_config & use better var names
+  * wrong: use DEFAULT_MODTUT2_STRING to provide "en"
+  * Comments to understand
+  * drop comment on AP_INIT_TAKE1() -- see in header
+  * create_server_config -- must explicitly set, not return
+  * provide explicitly zero as modifiers
+  * comments
+  * debian: use compat 11
+
+ -- Michal Maruska <mmaruska@gmail.com>  Sun, 31 Oct 2021 19:49:46 +0100
+
 mod-languagesubdomain (2.0) unstable; urgency=medium
 
   * Drop cdbs & old apache pkgs
