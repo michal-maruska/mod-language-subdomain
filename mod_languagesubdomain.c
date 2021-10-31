@@ -51,7 +51,7 @@ module AP_MODULE_DECLARE_DATA languagesubdomain_module;
  */
 typedef struct {
         char *string;
-} modtut2_config;
+} mod_configuration;
 
 
 /*
@@ -221,7 +221,7 @@ static apr_array_header_t *do_header_line(apr_pool_t *p,
 static int mod_tut2_method_handler (request_rec *r)
 {
   // Get the module configuration
-  modtut2_config *s_cfg = ap_get_module_config(r->server->module_config, &languagesubdomain_module);
+  mod_configuration *s_cfg = ap_get_module_config(r->server->module_config, &languagesubdomain_module);
 
 #if DEBUG
   fprintf(stderr, "%s: running (server %s)\n", __func__, r->server->server_hostname);
@@ -365,7 +365,7 @@ static void register_hooks (apr_pool_t *p)
 static const char *set_modtut2_string(cmd_parms *parms, void *mconfig, const char *arg)
 {
         // get the module configuration (this is the structure created by create_lang_config())
-        modtut2_config *s_cfg = ap_get_module_config(parms->server->module_config, &languagesubdomain_module);
+        mod_configuration *s_cfg = ap_get_module_config(parms->server->module_config, &languagesubdomain_module);
 
 #if DEBUG
         fprintf(stderr,"%s: re-configuring for %s %s (currently %s)\n", __FUNCTION__,
@@ -403,18 +403,19 @@ static const command_rec mod_lang_cmds[] =
  */
 static void *create_server_config(apr_pool_t *pool, server_rec *server)
 {
-        modtut2_config *newcfg;
+        mod_configuration *newcfg;
 #if DEBUG
         fprintf(stderr, "%s: Create per-server configuration for %s / %s\n", __func__,
                 server->defn_name, server->server_hostname);
 #endif
 
         // allocate space for the configuration structure from the provided pool p.
-        newcfg = (modtut2_config *) apr_pcalloc(pool, sizeof(modtut2_config));
+        newcfg = (mod_configuration *) apr_pcalloc(pool, sizeof(mod_configuration));
 
         // set the default value for the error string.
         newcfg->string = DEFAULT_MODTUT2_STRING;
 
+        //  fixme: necessary?
         ap_set_module_config(server->module_config, &languagesubdomain_module, newcfg);
         // return the new server configuration structure.
         return (void *) newcfg;
