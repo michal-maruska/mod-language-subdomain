@@ -23,10 +23,10 @@
 /*
  * Include the core server components.
  */
-#include "httpd.h"
+#include "httpd.h"  // /usr/include/apache2/httpd.h
 #include "http_config.h"
 
-/* mmc: */
+/* mmc: /usr/include/apr-1.0 */
 #include "apr-1.0/apr_tables.h"
 #include "apr-1.0/apr_lib.h"
 #include "apr-1.0/apr_strings.h"
