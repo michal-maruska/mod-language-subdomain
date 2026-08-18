@@ -1,3 +1,10 @@
+mod-languagesubdomain (2.3-maruska2-maruska) unstable; urgency=medium
+
+  * clean more
+  * ci: build by my Org workflow
+
+ -- Michal Maruska <mmaruska@gmail.com>  Tue, 18 Aug 2026 15:56:29 +0200
+
 mod-languagesubdomain (2.3-maruska2) unstable; urgency=medium
 
   * fix docs
